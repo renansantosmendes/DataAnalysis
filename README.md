@@ -1,0 +1,1 @@
+A partir de uma tabela csv de entrada podem ser realizados diversos tipos de pré-processamento: 
