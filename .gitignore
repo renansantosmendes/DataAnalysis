@@ -1,0 +1,30 @@
+# Build and binary folder of CMake and Python distutils
+/build*/
+/installed/
+/dist/
+
+# Build folder of Sphinx
+/docs/_build
+
+# Python and pytest caches
+*.pyc
+__pycache__/
+.pytest_cache/
+
+# Jupyter notebook checkpoints
+.ipynb_checkpoints/
+
+# OS X temporary and cache files
+*~
+.DS_Store
+
+# Eclipse
+/.cproject
+/.project
+.settings/
+.csettings/
+
+DataAnalysis.egg-info/
+
+# CLion
+.idea/

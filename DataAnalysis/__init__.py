@@ -126,9 +126,9 @@ def remove_spaces(message):
     new_message = re.sub('\s\s+' , ' ', message)
     return new_message
 
-class Pre_processing:
+class PreProcessing:
     
-    def __init__(self, input_file, api_small_talks = None, content_column = 'Content', encoding = 'utf-8', separator = ';', batch = 4):
+    def __init__(self, input_file, api_small_talks = None, content_column = 'Content', encoding = 'utf-8', sep = ';', batch = 4):
         data = pd.read_csv(input_file, encoding = encoding, sep = separator)
         self.data = data
         self.input_file = input_file
