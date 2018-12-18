@@ -56,7 +56,7 @@ def use_dictonary_from_file(message, file_name):
             correct_message.append(word)        
     return ' '.join(correct_message)
     
-def remove_abreviations(message): 
+def remove_abbreviations(message): 
     return use_dictonary_from_file(message, 'abbreviations.txt')
 
 def remove_portuguese_errors(message):
@@ -129,7 +129,7 @@ def remove_spaces(message):
 class PreProcessing:
     
     def __init__(self, input_file, api_small_talks = None, content_column = 'Content', encoding = 'utf-8', sep = ';', batch = 4):
-        data = pd.read_csv(input_file, encoding = encoding, sep = separator)
+        data = pd.read_csv(input_file, encoding = encoding, sep = sep)
         self.data = data
         self.input_file = input_file
         self.batch = batch
@@ -139,22 +139,22 @@ class PreProcessing:
         elif type(content_column) == int:
             self.text = data.loc[:, content_column]
         
-    def process(self, output_file, lower = True, punctuation = True, abreviation = True, typo = True, small_talk = True, emojis = True, wa_emojis = True, accentuation = True, number = True, relevant = False):
+    def process(self, output_file, lower = True, punctuation = True, abbreviation = True, typo = True, small_talk = True, emojis = True, wa_emojis = True, accentuation = True, number = True, relevant = False):
         
         data_processed = pd.DataFrame(data = self.text)
-        data_processed['Processed Content'] = ''
-        for idx, message in enumerate(self.text):
-            if type(message) == str:
-                if emojis: message = remove_emojis(message)
-                if wa_emojis: message = remove_whatsapp_emojis(message)
-                if lower: message = message.lower()
-                if punctuation: message = remove_punctuation(message)
-                if abreviation: message = remove_abreviations(message)
-                if typo: message = remove_portuguese_errors(message)
-                if accentuation: message = remove_accentuation(message)
-                if number: message = remove_numbers(message)
-                message = remove_spaces(message)
-                data_processed.loc[idx, 'Processed Content'] = message 
+        data_processed.columns = ['Content']
+        data_processed['Processed Content'] = self.text
+        
+        if emojis: data_processed['Processed Content'] = data_processed['Processed Content'].apply(remove_emojis)
+        if wa_emojis: data_processed['Processed Content'] = data_processed['Processed Content'].apply(remove_whatsapp_emojis)
+        if lower:  data_processed['Processed Content'] = data_processed['Processed Content'].str.lower()
+        if punctuation: data_processed['Processed Content'] = data_processed['Processed Content'].apply(remove_punctuation)
+        if abbreviation: data_processed['Processed Content'] = data_processed['Processed Content'].apply(remove_abbreviations)
+        if typo: data_processed['Processed Content'] = data_processed['Processed Content'].apply(remove_portuguese_errors)
+        if accentuation: data_processed['Processed Content'] = data_processed['Processed Content'].apply(remove_accentuation)
+        if number: data_processed['Processed Content'] = data_processed['Processed Content'].apply(remove_numbers)
+        data_processed['Processed Content'] = data_processed['Processed Content'].apply(remove_spaces)
+        
         if small_talk and self.api_small_talks is not None:
             responses = smalltalk_requests(data_processed, self.api_small_talks, self.batch, self.input_file, True)
             without_small_talks = [converting_response_from_API(response.json()) for response in responses]
@@ -165,5 +165,3 @@ class PreProcessing:
                 data_processed['Processed Content'] = without_small_talks.loc[:,'MarkedInput']
             
         data_processed.to_csv(output_file,sep=';',encoding='utf-8',index=False)
-        
-        
